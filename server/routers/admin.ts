@@ -10,9 +10,9 @@ export const adminRouter = t.router({
     }
     // Simulate fetching a list of students
     return [
-      { id: 1, name: "Alice Smith", email: "alice@example.com", level: "Básico", points: 500, isAdmin: false, userName: "Alice Smith", userEmail: "alice@example.com" },
-      { id: 2, name: "Bob Johnson", email: "bob@example.com", level: "Intermedio", points: 1200, isAdmin: false, userName: "Bob Johnson", userEmail: "bob@example.com" },
-      { id: 3, name: "Charlie Brown", email: "charlie@example.com", level: "Avanzado", points: 2000, isAdmin: false, userName: "Charlie Brown", userEmail: "charlie@example.com" },
+      { id: 1, name: "Alice Smith", email: "alice@example.com", level: "bachillerato", institution: "Liceo", phone: "099123456", points: 500, isAdmin: false, userName: "Alice Smith", userEmail: "alice@example.com" },
+      { id: 2, name: "Bob Johnson", email: "bob@example.com", level: "7-9", institution: "UTU", phone: "098765432", points: 1200, isAdmin: false, userName: "Bob Johnson", userEmail: "bob@example.com" },
+      { id: 3, name: "Charlie Brown", email: "charlie@example.com", level: "bachillerato", institution: "Liceo Militar", phone: "091111111", points: 2000, isAdmin: false, userName: "Charlie Brown", userEmail: "charlie@example.com" },
     ];
   }),
 

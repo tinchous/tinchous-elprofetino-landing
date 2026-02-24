@@ -30,4 +30,16 @@ export const authRouter = t.router({
     // Simulate session invalidation
     return { success: true, message: "Logout successful (simulated)" };
   }),
+
+  contact: t.procedure
+    .input(z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+      message: z.string().min(10),
+    }))
+    .mutation(async ({ input }) => {
+      // In a real app, this would send an email or save to a database
+      console.log(`Contact message from ${input.name} (${input.email}): ${input.message}`);
+      return { success: true, message: "Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto." };
+    }),
 });

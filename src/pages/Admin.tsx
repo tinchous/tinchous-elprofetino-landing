@@ -278,92 +278,140 @@ function StudentsTab() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {students?.map((student) => (
-          <Card key={student.id} className="p-6">
-            <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">{student.userName || "Sin nombre"}</h3>
-                <p className="text-sm text-muted-foreground">{student.userEmail}</p>
-                <div className="flex gap-4 text-sm">
-                  <span><strong>Nivel:</strong> {student.level || "N/A"}</span>
-                  <span><strong>Teléfono:</strong> {student.phone || "N/A"}</span>
-                </div>
-                <p className="text-sm"><strong>Materias:</strong> {student.subjects || "N/A"}</p>
-              </div>
-              <div className="flex gap-2">
-                <Dialog open={editingStudent?.id === student.id} onOpenChange={(open) => {
-                  if (open) {
-                    setEditingStudent(student);
-                    setFormData({
-                      userId: student.userId,
-                      level: student.level || "",
-                      institution: student.institution || "",
-                      subjects: student.subjects || "",
-                      phone: student.phone || "",
-                    });
-                  } else {
-                    setEditingStudent(null);
-                  }
-                }}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Editar Estudiante</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleUpdate} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-level">Nivel</Label>
-                        <Select value={formData.level} onValueChange={(value) => setFormData({ ...formData, level: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona nivel" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="7-9">7º a 9º</SelectItem>
-                            <SelectItem value="bachillerato">Bachillerato</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-subjects">Materias (JSON)</Label>
-                        <Input
-                          id="edit-subjects"
-                          value={formData.subjects}
-                          onChange={(e) => setFormData({ ...formData, subjects: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-phone">Teléfono</Label>
-                        <Input
-                          id="edit-phone"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button type="submit" disabled={updateStudent.isPending}>
-                          {updateStudent.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Actualizar"}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(student.id)}
-                  disabled={deleteStudent.isPending}
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
+      <div className="bg-card border border-border/50 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs uppercase bg-muted/50 text-muted-foreground">
+              <tr>
+                <th className="px-6 py-3 font-medium">Estudiante</th>
+                <th className="px-6 py-3 font-medium">Nivel</th>
+                <th className="px-6 py-3 font-medium">Institución</th>
+                <th className="px-6 py-3 font-medium">Teléfono</th>
+                <th className="px-6 py-3 font-medium">Materias</th>
+                <th className="px-6 py-3 font-medium text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/50">
+              {students?.map((student) => (
+                <tr key={student.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="font-semibold">{student.userName || "Sin nombre"}</div>
+                    <div className="text-xs text-muted-foreground">{student.userEmail}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="capitalize">{student.level || "N/A"}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {student.institution || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 font-mono text-xs">
+                    {student.phone || "N/A"}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-1">
+                      {student.subjects ? (
+                        JSON.parse(student.subjects.startsWith('[') ? student.subjects : `["${student.subjects}"]`).map((s: string) => (
+                          <span key={s} className="text-[10px] bg-muted px-1.5 py-0.5 rounded border border-border/50 capitalize">
+                            {s}
+                          </span>
+                        ))
+                      ) : "N/A"}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Dialog open={editingStudent?.id === student.id} onOpenChange={(open) => {
+                        if (open) {
+                          setEditingStudent(student);
+                          setFormData({
+                            userId: student.userId,
+                            level: student.level || "",
+                            institution: student.institution || "",
+                            subjects: student.subjects || "",
+                            phone: student.phone || "",
+                          });
+                        } else {
+                          setEditingStudent(null);
+                        }
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Editar Estudiante</DialogTitle>
+                          </DialogHeader>
+                          <form onSubmit={handleUpdate} className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-level">Nivel</Label>
+                              <Select value={formData.level} onValueChange={(value) => setFormData({ ...formData, level: value })}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona nivel" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="7-9">7º a 9º</SelectItem>
+                                  <SelectItem value="bachillerato">Bachillerato</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-institution">Institución</Label>
+                              <Select value={formData.institution} onValueChange={(value) => setFormData({ ...formData, institution: value })}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona institución" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Liceo">Liceo</SelectItem>
+                                  <SelectItem value="UTU">UTU</SelectItem>
+                                  <SelectItem value="Liceo Militar">Liceo Militar</SelectItem>
+                                  <SelectItem value="Magisterio">Magisterio</SelectItem>
+                                  <SelectItem value="Escuela Policía">Escuela Policía</SelectItem>
+                                  <SelectItem value="Otros">Otros</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-subjects">Materias (JSON)</Label>
+                              <Input
+                                id="edit-subjects"
+                                value={formData.subjects}
+                                onChange={(e) => setFormData({ ...formData, subjects: e.target.value })}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-phone">Teléfono</Label>
+                              <Input
+                                id="edit-phone"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                              />
+                            </div>
+                            <DialogFooter>
+                              <Button type="submit" disabled={updateStudent.isPending}>
+                                {updateStudent.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Actualizar"}
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                        onClick={() => handleDelete(student.id)}
+                        disabled={deleteStudent.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -531,114 +579,126 @@ function ClassesTab() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
-        {classes?.map((cls) => (
-          <Card key={cls.id} className="p-6">
-            <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold">{cls.topic || "Clase sin tema"}</h3>
-                  <span className={`text-xs px-2 py-1 rounded ${
-                    cls.status === 'scheduled' ? 'bg-blue-500/20 text-blue-400' :
-                    cls.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                    'bg-red-500/20 text-red-400'
-                  }`}>
-                    {cls.status === 'scheduled' ? 'Programada' : cls.status === 'completed' ? 'Completada' : 'Cancelada'}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">{(cls as any).studentName || 'Estudiante'}</p>
-                <div className="flex gap-4 text-sm">
-                  <span><strong>Materia:</strong> {cls.subject === 'matematica' ? 'Matemática' : 'Física'}</span>
-                  <span><strong>Fecha:</strong> {new Date(cls.scheduledAt).toLocaleString('es-UY')}</span>
-                  <span><strong>Duración:</strong> {cls.duration} min</span>
-                </div>
-                {cls.notes && <p className="text-sm"><strong>Notas:</strong> {cls.notes}</p>}
-              </div>
-              <div className="flex gap-2">
-                <Dialog open={editingClass?.id === cls.id} onOpenChange={(open) => {
-                  if (open) {
-                    setEditingClass(cls);
-                    setFormData({
-                      studentId: cls.studentId,
-                      subject: cls.subject,
-                      scheduledAt: new Date(cls.scheduledAt).toISOString().slice(0, 16),
-                      duration: cls.duration,
-                      topic: cls.topic || "",
-                      notes: cls.notes || "",
-                      status: cls.status,
-                    } as any);
-                  } else {
-                    setEditingClass(null);
-                  }
-                }}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Editar Clase</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleUpdate} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-scheduledAt">Fecha y Hora</Label>
-                        <Input
-                          id="edit-scheduledAt"
-                          type="datetime-local"
-                          value={formData.scheduledAt}
-                          onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-status">Estado</Label>
-                        <Select value={(formData as any).status} onValueChange={(value) => setFormData({ ...formData, status: value } as any)}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="scheduled">Programada</SelectItem>
-                            <SelectItem value="completed">Completada</SelectItem>
-                            <SelectItem value="cancelled">Cancelada</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-topic">Tema</Label>
-                        <Input
-                          id="edit-topic"
-                          value={formData.topic}
-                          onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-notes">Notas</Label>
-                        <Textarea
-                          id="edit-notes"
-                          value={formData.notes}
-                          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button type="submit" disabled={updateClass.isPending}>
-                          {updateClass.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Actualizar"}
-                        </Button>
-                      </DialogFooter>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(cls.id)}
-                  disabled={deleteClass.isPending}
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
+      <div className="bg-card border border-border/50 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs uppercase bg-muted/50 text-muted-foreground">
+              <tr>
+                <th className="px-6 py-3 font-medium">Tema / Materia</th>
+                <th className="px-6 py-3 font-medium">Estudiante</th>
+                <th className="px-6 py-3 font-medium">Fecha y Hora</th>
+                <th className="px-6 py-3 font-medium">Duración</th>
+                <th className="px-6 py-3 font-medium">Estado</th>
+                <th className="px-6 py-3 font-medium text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/50">
+              {classes?.map((cls) => (
+                <tr key={cls.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="font-semibold">{cls.topic || "Sin tema"}</div>
+                    <div className="text-[10px] uppercase text-muted-foreground">{cls.subject}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    {(cls as any).studentName || "Estudiante"}
+                  </td>
+                  <td className="px-6 py-4">
+                    {format(new Date(cls.scheduledAt), "d 'de' MMM, HH:mm", { locale: es })}
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {cls.duration} min
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold border ${
+                      cls.status === 'scheduled' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                      cls.status === 'completed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                      'bg-red-500/10 text-red-400 border-red-500/20'
+                    }`}>
+                      {cls.status === 'scheduled' ? 'Programada' : cls.status === 'completed' ? 'Completada' : 'Cancelada'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Dialog open={editingClass?.id === cls.id} onOpenChange={(open) => {
+                        if (open) {
+                          setEditingClass(cls);
+                          setFormData({
+                            studentId: cls.studentId,
+                            subject: cls.subject,
+                            scheduledAt: new Date(cls.scheduledAt).toISOString().slice(0, 16),
+                            duration: cls.duration,
+                            topic: cls.topic || "",
+                            notes: cls.notes || "",
+                            status: cls.status,
+                          } as any);
+                        } else {
+                          setEditingClass(null);
+                        }
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Editar Clase</DialogTitle>
+                          </DialogHeader>
+                          <form onSubmit={handleUpdate} className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-topic">Tema</Label>
+                              <Input
+                                id="edit-topic"
+                                value={formData.topic}
+                                onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-scheduledAt">Fecha y Hora</Label>
+                              <Input
+                                id="edit-scheduledAt"
+                                type="datetime-local"
+                                value={formData.scheduledAt}
+                                onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="edit-status">Estado</Label>
+                              <Select value={(formData as any).status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecciona estado" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="scheduled">Programada</SelectItem>
+                                  <SelectItem value="completed">Completada</SelectItem>
+                                  <SelectItem value="cancelled">Cancelada</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <DialogFooter>
+                              <Button type="submit" disabled={updateClass.isPending}>
+                                {updateClass.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Actualizar"}
+                              </Button>
+                            </DialogFooter>
+                          </form>
+                        </DialogContent>
+                      </Dialog>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                        onClick={() => handleDelete(cls.id)}
+                        disabled={deleteClass.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
